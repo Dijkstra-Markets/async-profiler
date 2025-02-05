@@ -13,6 +13,7 @@ const long DEFAULT_INTERVAL = 10000000;      // 10 ms
 const long DEFAULT_ALLOC_INTERVAL = 524287;  // 512 KiB
 const long DEFAULT_LOCK_INTERVAL = 10000;    // 10 us
 const int DEFAULT_JSTACKDEPTH = 2048;
+const long DEFAULT_HEARTBEAT_DELAY_NS = 100 * 1000; // 100us
 
 const char* const EVENT_CPU        = "cpu";
 const char* const EVENT_ALLOC      = "alloc";
@@ -205,6 +206,10 @@ class Arguments {
     const char* _title;
     double _minwidth;
     bool _reverse;
+    const char* _heartbeat_file;
+    long _heartbeat_delay_ns;
+    bool _heartbeat_unix_clock;
+    bool _heartbeat_realtime_clock;
 
     Arguments() :
         _buf(NULL),
@@ -256,7 +261,11 @@ class Arguments {
         _end(NULL),
         _title(NULL),
         _minwidth(0),
-        _reverse(false) {
+        _reverse(false),
+        _heartbeat_file(NULL),
+        _heartbeat_delay_ns(DEFAULT_HEARTBEAT_DELAY_NS),
+        _heartbeat_unix_clock(false),
+        _heartbeat_realtime_clock(true) {
     }
 
     ~Arguments();

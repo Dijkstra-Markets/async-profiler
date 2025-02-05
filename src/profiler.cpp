@@ -613,6 +613,10 @@ void Profiler::fillFrameTypes(ASGCT_CallFrame* frames, int num_frames, NMethod* 
 }
 
 u64 Profiler::recordSample(void* ucontext, u64 counter, EventType event_type, Event* event) {
+    if (this->_filter && !this->_filter->shouldProcess()) {
+        return 0;
+    }
+
     atomicInc(_total_samples);
 
     int tid = fastThreadId();
@@ -1101,6 +1105,13 @@ Error Profiler::start(Arguments& args, bool reset) {
             return Error("Failed to initialize FdTransferClient");
         }
     }
+    if (args._heartbeat_file) {
+        _filter = new HeartBeatFilter(
+                            args._heartbeat_file,
+                            args._heartbeat_delay_ns,
+                            args._heartbeat_unix_clock,
+                            args._heartbeat_realtime_clock);
+    }
 
     // Save the arguments for shutdown or restart
     args.save();
@@ -1293,6 +1304,8 @@ Error Profiler::stop(bool restart) {
     lockAll();
     _jfr.stop();
     unlockAll();
+
+    delete _filter;
 
     if (!restart) {
         FdTransferClient::closePeer();

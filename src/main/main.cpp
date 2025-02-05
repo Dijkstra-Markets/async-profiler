@@ -87,6 +87,10 @@ static const char USAGE_STRING[] =
     "  --libpath path    full path to libasyncProfiler.so in the container\n"
     "  --fdtransfer      use fdtransfer to serve perf requests\n"
     "                    from the non-privileged target\n"
+    "  --heartbeat-file file\n"
+    "  --heartbeat-interval-ns delay\n"
+    "  --heartbeat-clock-realtime\n"
+    "  --heartbeat-clock-unix\n"
     "\n"
     "<pid> is a numeric process ID of the target JVM\n"
     "      or 'jps' keyword to find running JVM automatically\n"
@@ -537,7 +541,14 @@ int main(int argc, const char** argv) {
         } else if (arg.str()[0] != '-' && args.count() == 0 && pid == 0) {
             // The last argument is the application name as it would appear in the jps tool
             pid = jps("jps -J-XX:+PerfDisableSharedMem", arg.str());
-
+        } else if (arg == "--heartbeat-file") {
+            params << ",hb-file=" << args.next();
+        } else if (arg == "--heartbeat-interval-ns") {
+            params << ",delayns=" << args.next();
+        } else if (arg == "--heartbeat-clock-realtime") {
+            params << ",clock-rt";
+        } else if (arg == "--heartbeat-clock-unix") {
+            params << ",clock-unix";
         } else {
             fprintf(stderr, "Unrecognized option: %s\n", arg.str());
             return 1;

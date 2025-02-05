@@ -419,6 +419,22 @@ Error Arguments::parse(const char* args) {
             CASE("reverse")
                 _reverse = true;
 
+            CASE("hb-file")
+                _heartbeat_file = value;
+
+            CASE("delayns")
+                _heartbeat_delay_ns = strtol(value, NULL, 0);
+
+            CASE("clock-unix") {
+                _heartbeat_unix_clock = true;
+                _heartbeat_realtime_clock = false;
+            }
+
+            CASE("clock-rt") {
+                _heartbeat_unix_clock = false;
+                _heartbeat_realtime_clock = true;
+            }
+
             DEFAULT()
                 if (_unknown_arg == NULL) _unknown_arg = arg;
         }
